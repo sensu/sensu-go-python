@@ -4,6 +4,14 @@ setup:
 	venv/bin/pip install -U pip wheel twine
 	venv/bin/pip install -e .[dev]
 
+.PHONY: format
+format:
+	venv/bin/black -l 80 src/sensu_go
+
+.PHONY: lint
+lint:
+	venv/bin/black --check --diff -l 80 src/sensu_go
+
 .PHONY: dist
 dist:
 	venv/bin/python setup.py sdist bdist_wheel
