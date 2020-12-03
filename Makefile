@@ -12,6 +12,7 @@ format:
 lint:
 	venv/bin/black --check --diff -l 80 src/sensu_go
 	venv/bin/flake8 src/sensu_go
+	venv/bin/mypy --strict src/sensu_go
 
 .PHONY: dist
 dist:
