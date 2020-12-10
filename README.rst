@@ -13,14 +13,13 @@ it into a dedicated virtual environment like this::
 
    $ python3 -m venv venv
    $ . venv/bin/activate
-   (venv) $ pip install sensu_go
+   (venv) $ pip install sensu-go
 
 
 Using the client
 ----------------
 
 .. note::
-
    If you would like to follow along in a Python REPL, you can start a
    containerized Sensu Go instance like this::
 
@@ -91,7 +90,7 @@ Same thing goes for other things like checks and assets:
    check = client.checks.create(check_data)
 
 Once we have a resource object at hand, we can update it and propagate the
-changes to the backend::
+changes to the backend:
 
 .. code-block:: python
 
