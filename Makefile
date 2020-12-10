@@ -1,6 +1,6 @@
 .PHONY: setup
 setup:
-	test -d venv && python3 -m venv venv
+	test -d venv || python3 -m venv venv
 	venv/bin/pip install -U pip wheel twine
 	venv/bin/pip install -e .[dev]
 
@@ -28,4 +28,5 @@ publish:
 
 .PHONY: clean
 clean:
-	rm -rf dist
+	rm -rf dist build
+	find src/sensu_go -name __pycache__ -type d | xargs rm -rf
