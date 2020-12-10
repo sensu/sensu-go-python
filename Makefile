@@ -23,7 +23,8 @@ dist:
 	venv/bin/python setup.py sdist bdist_wheel
 
 .PHONY: publish
-publish:
+publish: clean dist
+	venv/bin/twine check dist/*
 	venv/bin/twine upload dist/*
 
 .PHONY: clean
