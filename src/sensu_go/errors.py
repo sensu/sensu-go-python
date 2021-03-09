@@ -18,9 +18,7 @@ class ResponseError(SensuError):
         self.text = text
 
         super().__init__(
-            "{}:\n  url: {}\n  status: {}\n  text: {}".format(
-                msg, url, status, text
-            )
+            "{}:\n  url: {}\n  status: {}\n  text: {}".format(msg, url, status, text)
         )
 
 

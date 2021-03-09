@@ -6,11 +6,11 @@ setup:
 
 .PHONY: format
 format:
-	venv/bin/black -l 79 src/sensu_go tests
+	venv/bin/black src/sensu_go tests
 
 .PHONY: lint
 lint:
-	venv/bin/black --check --diff -l 79 src/sensu_go tests
+	venv/bin/black --check --diff src/sensu_go tests
 	venv/bin/flake8 src/sensu_go
 	venv/bin/mypy --strict src/sensu_go
 

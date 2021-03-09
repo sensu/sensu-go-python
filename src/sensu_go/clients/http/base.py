@@ -69,9 +69,7 @@ class HTTPClient(abc.ABC):
         except requests.exceptions.ConnectionError:
             raise HTTPError("{} {} failed".format(method, url))
 
-    def request(
-        self, method: str, path: str, payload: JSON = None
-    ) -> Response:
+    def request(self, method: str, path: str, payload: JSON = None) -> Response:
         headers = dict(Authorization=self.auth_header_value)
         return self._request(method, path, payload, headers)
 
