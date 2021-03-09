@@ -18,9 +18,7 @@ class NamespacedClient(ResourceClient):
         self._default_ns = default_namespace
 
     def _get_path(self, ns: Optional[str], name: Optional[str] = None) -> str:
-        return self.resource_class.get_path(
-            namespace=ns or self._default_ns, name=name
-        )
+        return self.resource_class.get_path(namespace=ns or self._default_ns, name=name)
 
     def list(self, namespace: Optional[str] = None) -> List[NsResource]:
         return super().do_list(self._get_path(namespace))

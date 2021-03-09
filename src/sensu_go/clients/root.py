@@ -42,9 +42,7 @@ class Client:
         verify: bool = True,
         ca_path: Optional[str] = None,
     ) -> None:
-        self._client = _get_http_client(
-            address, username, password, verify, ca_path
-        )
+        self._client = _get_http_client(address, username, password, verify, ca_path)
 
         # Namespaced API
         ns = default_namespace
