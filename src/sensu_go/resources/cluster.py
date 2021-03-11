@@ -3,13 +3,11 @@
 from typing import List
 
 from sensu_go.resources.base import Resource
-from sensu_go.typing import JSONItem
 
 
 class ClusterResource(Resource):
-    @staticmethod
-    def validate(data: JSONItem) -> List[str]:
+    def validate(self) -> List[str]:
         result = []
-        if not data.get("metadata", {}).get("name"):
+        if "name" not in self.metadata:
             result.append("Cluster resources need to have a 'name'.")
         return result

@@ -26,6 +26,12 @@ Using the client
       $ docker run --rm -p 8080:8080 -p 3000:3000 \
           sensu/sensu sensu-backend start
 
+.. note::
+   Version 0.3.0 broke the API compatibility with the previous versions. The
+   reason for this API break is generalization and unification of Sensu Go
+   management. With new changes in place, managing configuration through the
+   resource interface folows the same patterns for both v1 and v2 API endponts.
+
 Before we can start using the client, we need to create one:
 
 .. code-block:: python
@@ -45,12 +51,12 @@ Now we can list available resources in the `default` namespace:
    print(client.checks.list())
 
 When creating a resource, we need to provide the payload specified in the
-Sensu Go's API documentation. For example, this is how we would creae a new
+Sensu Go's API documentation. For example, this is how we would create a new
 namespace called `demo`:
 
 .. code-block:: python
 
-   ns = client.namespaces.create(dict(name="demo"))
+   ns = client.namespaces.create(spec=dict(name="demo"))
    print(ns)
    print(client.namespaces.list())
 
@@ -58,36 +64,38 @@ Same thing goes for other things like checks and assets:
 
 .. code-block:: python
 
-   asset_data = {
-       "metadata": {
+   client.assets.create(
+       metadata={
            "name": "sensu-slack-handler",
            "namespace": "demo"
        },
-       "url": "https://github.com/sensu/sensu-slack-handler/releases/download/1.0.3/sensu-slack-handler_1.0.3_linux_amd64.tar.gz",
-       "sha512": "68720865127fbc7c2fe16ca4d7bbf2a187a2df703f4b4acae1c93e8a66556e9079e1270521999b5871473e6c851f51b34097c54fdb8d18eedb7064df9019adc8",
-       "filters": [
-           "entity.system.os == 'linux'",
-           "entity.system.arch == 'amd64'",
-       ],
-       "headers": {
-           "Authorization": "Bearer $TOKEN",
-           "X-Forwarded-For": "client1, proxy1, proxy2",
+       spec={
+           "url": "https://github.com/sensu/sensu-slack-handler/releases/download/1.0.3/sensu-slack-handler_1.0.3_linux_amd64.tar.gz",
+           "sha512": "68720865127fbc7c2fe16ca4d7bbf2a187a2df703f4b4acae1c93e8a66556e9079e1270521999b5871473e6c851f51b34097c54fdb8d18eedb7064df9019adc8",
+           "filters": [
+               "entity.system.os == 'linux'",
+               "entity.system.arch == 'amd64'",
+           ],
+           "headers": {
+               "Authorization": "Bearer $TOKEN",
+               "X-Forwarded-For": "client1, proxy1, proxy2",
+           },
        },
-   }
-   client.assets.create(asset_data)
+   )
 
-   check_data = {
-       "metadata": {
+   check = client.checks.create(
+       metadata={
            "name": "check-cpu",
            "namespace": "default"
        },
-       "command": "check-cpu.sh -w 75 -c 90",
-       "subscriptions": ["linux"],
-       "interval": 60,
-       "publish": True,
-       "handlers": ["slack"],
-   }
-   check = client.checks.create(check_data)
+       spec={
+           "command": "check-cpu.sh -w 75 -c 90",
+           "subscriptions": ["linux"],
+           "interval": 60,
+           "publish": True,
+           "handlers": ["slack"],
+       },
+   )
 
 Once we have a resource object at hand, we can update it and propagate the
 changes to the backend:
@@ -95,8 +103,8 @@ changes to the backend:
 .. code-block:: python
 
    # Update local representation
-   check["interval"] = 100
-   check.update(publish=False, subscriptions=["my-sub"])
+   check.spec["interval"] = 100
+   check.spec.update(publish=False, subscriptions=["my-sub"])
    # Propagate the changes
    check.save()
 
@@ -108,7 +116,7 @@ the `demo` namespace):
    asset = client.assets.get("sensu-slack-handler", "demo")
    print(asset)
 
-We can also reload the resource of we expect it to change:
+We can also reload the resource if we expect it to change:
 
 .. code-block:: python
 

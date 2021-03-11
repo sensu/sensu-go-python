@@ -1,6 +1,6 @@
 # Copyright (c) 2020 XLAB Steampunk
 
-from typing import cast, List, Type, TypeVar
+from typing import cast, List, Optional, Type, TypeVar
 
 from sensu_go.clients.http.base import HTTPClient
 from sensu_go.errors import ResponseError
@@ -50,13 +50,17 @@ class ResourceClient:
                 resp.text,
             )
 
-    def create(self, data: JSONItem) -> T:
-        resource = self.resource_class(self, data)
-        path = resource.get_path(namespace=resource.namespace)
-        resp = self.client.post(path, resource.to_api())
+    def create(
+        self,
+        spec: JSONItem,
+        metadata: Optional[JSONItem] = None,
+        type: Optional[str] = None,
+    ) -> T:
+        resource = self.resource_class(self, spec, metadata, type)
+        resp = self.client.post(resource.class_path, resource.to_api())
         if resp.status != 201:
             raise ResponseError(
-                "Expected 200 when creating resource",
+                "Expected 201 when creating resource",
                 resp.url,
                 resp.status,
                 resp.text,
@@ -83,6 +87,4 @@ class ResourceClient:
         self.reload(resource)
 
     def reload(self, resource: T) -> None:
-        remote_resource = cast(T, self.do_get(resource.path))
-        resource.clear()
-        resource.update(remote_resource)
+        resource.update(cast(T, self.do_get(resource.path)))
