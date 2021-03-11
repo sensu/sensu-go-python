@@ -14,6 +14,7 @@ from sensu_go.resources.entity import Entity
 from sensu_go.resources.filter import Filter
 from sensu_go.resources.handler import Handler
 from sensu_go.resources.hook import Hook
+from sensu_go.resources.mutator import Mutator
 from sensu_go.resources.silence import Silence
 
 from sensu_go.resources.namespace import Namespace
@@ -54,6 +55,7 @@ class Client:
         self.filters = NamespacedClient(self._client, Filter, ns)
         self.handlers = NamespacedClient(self._client, Handler, ns)
         self.hooks = NamespacedClient(self._client, Hook, ns)
+        self.mutators = NamespacedClient(self._client, Mutator, ns)
         self.silences = NamespacedClient(self._client, Silence, ns)
 
         # Cluster-wide API
