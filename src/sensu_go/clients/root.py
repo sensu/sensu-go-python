@@ -11,6 +11,7 @@ from sensu_go.clients.resource.namespaced import NamespacedClient
 from sensu_go.resources.asset import Asset
 from sensu_go.resources.check import Check
 from sensu_go.resources.entity import Entity
+from sensu_go.resources.event import Event
 from sensu_go.resources.filter import Filter
 from sensu_go.resources.handler import Handler
 from sensu_go.resources.hook import Hook
@@ -52,6 +53,7 @@ class Client:
         self.assets = NamespacedClient(self._client, Asset, ns)
         self.checks = NamespacedClient(self._client, Check, ns)
         self.entities = NamespacedClient(self._client, Entity, ns)
+        self.events = NamespacedClient(self._client, Event, ns)
         self.filters = NamespacedClient(self._client, Filter, ns)
         self.handlers = NamespacedClient(self._client, Handler, ns)
         self.hooks = NamespacedClient(self._client, Hook, ns)
