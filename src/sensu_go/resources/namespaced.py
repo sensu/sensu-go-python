@@ -3,15 +3,13 @@
 from typing import List
 
 from sensu_go.resources.base import Resource
-from sensu_go.typing import JSONItem
 
 
 class NamespacedResource(Resource):
-    @staticmethod
-    def validate(data: JSONItem) -> List[str]:
+    def validate(self) -> List[str]:
         result = []
-        if not data.get("metadata", {}).get("name"):
+        if "name" not in self.metadata:
             result.append("Namespaced resources need to have a 'name'.")
-        if not data.get("metadata", {}).get("name"):
+        if "namespace" not in self.metadata:
             result.append("Namespaced resources need to have a 'namespace'.")
         return result
