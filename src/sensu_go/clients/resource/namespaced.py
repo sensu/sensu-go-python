@@ -23,6 +23,9 @@ class NamespacedClient(ResourceClient):
     def list(self, namespace: Optional[str] = None) -> List[NsResource]:
         return super().do_list(self._get_path(namespace))
 
+    def find(self, name: str, namespace: Optional[str] = None) -> Optional[NsResource]:
+        return self.do_find(self._get_path(namespace, name))
+
     def get(self, name: str, namespace: Optional[str] = None) -> NsResource:
         return super().do_get(self._get_path(namespace, name))
 

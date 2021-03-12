@@ -134,6 +134,18 @@ And of course, we can also delete the resource:
    for c in client.checks.list():
        c.delete()
 
+The ``get`` method will fail spectacularly if the resource we are trying to
+fetch does not exist on the backend. If we would like to check the presence of
+a resource, we can use the ``find`` method:
+
+.. code-block:: python
+
+   hook = client.hooks.find("hook-that-might-not-exist")
+   if hook:
+       print("We do have a hook!")
+   else:
+       print("No hook on the backend.")
+
 We can also send requests to the backend directly if the resource API is not
 available or does not make sense:
 

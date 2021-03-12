@@ -28,6 +28,21 @@ class ResourceClient:
         data = cast(List[JSONItem], resp.json)
         return [self.resource_class.from_api(self, d) for d in data]
 
+    def do_find(self, path: str) -> Optional[T]:
+        resp = self.client.get(path)
+        if resp.status == 404:
+            return None
+
+        if resp.status != 200:
+            raise ResponseError(
+                "Expected 200 when fetching resource",
+                resp.url,
+                resp.status,
+                resp.text,
+            )
+        # TODO: Add check for invalid JSON
+        return self.resource_class.from_api(self, cast(JSONItem, resp.json))
+
     def do_get(self, path: str) -> T:
         resp = self.client.get(path)
         if resp.status != 200:
