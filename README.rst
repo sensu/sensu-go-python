@@ -56,7 +56,7 @@ namespace called `demo`:
 
 .. code-block:: python
 
-   ns = client.namespaces.create(spec=dict(name="demo"))
+   ns = client.namespaces.create(metdata={}, spec=dict(name="demo"))
    print(ns)
    print(client.namespaces.list())
 

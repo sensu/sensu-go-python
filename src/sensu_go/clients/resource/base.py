@@ -68,7 +68,7 @@ class ResourceClient:
     def create(
         self,
         spec: JSONItem,
-        metadata: Optional[JSONItem] = None,
+        metadata: JSONItem,
         type: Optional[str] = None,
     ) -> T:
         resource = self.resource_class(self, spec, metadata, type)
