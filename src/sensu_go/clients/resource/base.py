@@ -71,20 +71,14 @@ class ResourceClient:
         metadata: JSONItem,
         type: Optional[str] = None,
     ) -> T:
+        # We do not use POST for creating resources because not all resources support
+        # this method of creation (for example, secrets and secrets providers).
+
         resource = self.resource_class(self, spec, metadata, type)
-        resp = self.client.post(resource.class_path, resource.to_api())
-        if resp.status != 201:
-            raise ResponseError(
-                "Expected 201 when creating resource",
-                resp.url,
-                resp.status,
-                resp.text,
-            )
+        if self.do_find(resource.path):
+            raise ValueError("Resource at {} already exists.".format(resource.path))
 
-        # We need to reload the resource because the backend can add some
-        # default values on top of what we sent.
-        self.reload(resource)
-
+        self.save(resource)
         return resource
 
     def save(self, resource: T) -> None:
