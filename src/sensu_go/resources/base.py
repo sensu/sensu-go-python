@@ -117,3 +117,6 @@ class Resource(metaclass=abc.ABCMeta):
 
     def delete(self) -> None:
         self.client.do_delete(self.path)
+
+    def __repr__(self) -> str:
+        return "{}({})".format(self.type, self.path)
