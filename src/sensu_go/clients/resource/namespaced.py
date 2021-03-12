@@ -35,13 +35,13 @@ class NamespacedClient(ResourceClient):
         return self.resource_class.get_path(namespace=ns or self._default_ns, name=name)
 
     def list(self, namespace: Optional[str] = None) -> List[NsResource]:
-        return super().do_list(self._get_path(namespace))
+        return self.do_list(self._get_path(namespace))
 
     def find(self, name: str, namespace: Optional[str] = None) -> Optional[NsResource]:
         return self.do_find(self._get_path(namespace, name))
 
     def get(self, name: str, namespace: Optional[str] = None) -> NsResource:
-        return super().do_get(self._get_path(namespace, name))
+        return self.do_get(self._get_path(namespace, name))
 
     def delete(self, name: str, namespace: Optional[str] = None) -> None:
-        super().do_delete(self._get_path(namespace, name))
+        self.do_delete(self._get_path(namespace, name))
