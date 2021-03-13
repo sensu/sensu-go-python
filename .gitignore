@@ -3,3 +3,5 @@ build
 venv
 src/sensu_go.egg-info/
 .eggs
+.pyc
+__pycache__
