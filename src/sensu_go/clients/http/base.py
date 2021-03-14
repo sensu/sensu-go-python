@@ -56,6 +56,7 @@ class HTTPClient(abc.ABC):
         path: str,
         payload: JSON = None,
         headers: Optional[Dict[str, str]] = None,
+        query: Optional[Dict[str, str]] = None,
         auth: Optional[Tuple[str, str]] = None,
     ) -> Response:
         headers = headers or {}
@@ -63,18 +64,28 @@ class HTTPClient(abc.ABC):
         try:
             return Response(
                 self.session.request(
-                    method, url, json=payload, headers=headers, auth=auth
+                    method, url, json=payload, headers=headers, params=query, auth=auth
                 )
             )
         except requests.exceptions.ConnectionError:
             raise HTTPError("{} {} failed".format(method, url))
 
-    def request(self, method: str, path: str, payload: JSON = None) -> Response:
+    def request(
+        self,
+        method: str,
+        path: str,
+        payload: JSON = None,
+        query: Optional[Dict[str, str]] = None,
+    ) -> Response:
         headers = dict(Authorization=self.auth_header_value)
-        return self._request(method, path, payload, headers)
+        return self._request(method, path, payload, headers, query)
 
-    def get(self, path: str) -> Response:
-        return self.request("GET", path)
+    def get(
+        self,
+        path: str,
+        query: Optional[Dict[str, str]] = None,
+    ) -> Response:
+        return self.request("GET", path, query=query)
 
     def post(self, path: str, payload: JSON) -> Response:
         return self.request("POST", path, payload)
