@@ -10,6 +10,7 @@ class Namespace(ClusterResource):
     PATH_TEMPLATE = "/api/core/v2/namespaces"
     TYPE = "Namespace"
     API_VERSION = "core/v2"
+    FIELD_PREFIX = "namespace"
 
     @staticmethod
     def api_to_native(data: JSONItem, type: str) -> JSONItem:

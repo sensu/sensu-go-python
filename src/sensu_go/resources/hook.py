@@ -8,3 +8,4 @@ class Hook(V2Mixin, NamespacedResource):
     PATH_TEMPLATE = "/api/core/v2/namespaces/{namespace}/hooks"
     TYPE = "HookConfig"
     API_VERSION = "core/v2"
+    FIELD_PREFIX = "hook"

@@ -4,6 +4,7 @@ from typing import cast, List, Optional, Type, TypeVar
 
 from sensu_go.clients.http.base import HTTPClient
 from sensu_go.errors import ResponseError
+from sensu_go.clients.resource.operator import Operator
 from sensu_go.resources.base import Resource
 from sensu_go.typing import JSONItem
 
@@ -15,8 +16,21 @@ class ResourceClient:
         self.client = client
         self.resource_class = resource_class
 
-    def do_list(self, path: str) -> List[T]:
-        resp = self.client.get(path)
+    def do_list(
+        self,
+        path: str,
+        label_selector: Optional[Operator] = None,
+        field_selector: Optional[Operator] = None,
+    ) -> List[T]:
+        query = {}
+        if label_selector:
+            query["labelSelector"] = label_selector.serialize()
+        if field_selector:
+            query["fieldSelector"] = field_selector.serialize(
+                self.resource_class.FIELD_PREFIX
+            )
+
+        resp = self.client.get(path, query=query)
         if resp.status != 200:
             raise ResponseError(
                 "Expected 200 when listing resources",

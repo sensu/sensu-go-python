@@ -10,6 +10,7 @@ class Event(V2Mixin, NamespacedResource):
     PATH_TEMPLATE = "/api/core/v2/namespaces/{namespace}/events"
     TYPE = "Event"
     API_VERSION = "core/v2"
+    FIELD_PREFIX = "event"
 
     def validate(self) -> List[str]:
         # Events do not have names, but they need to have associated entity and a check

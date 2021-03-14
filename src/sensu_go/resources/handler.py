@@ -8,3 +8,4 @@ class Handler(V2Mixin, NamespacedResource):
     PATH_TEMPLATE = "/api/core/v2/namespaces/{namespace}/handlers"
     TYPE = "Handler"
     API_VERSION = "core/v2"
+    FIELD_PREFIX = "handler"
