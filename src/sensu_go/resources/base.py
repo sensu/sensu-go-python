@@ -21,6 +21,7 @@ class Resource(metaclass=abc.ABCMeta):
     PATH_TEMPLATE: str
     TYPE: str
     API_VERSION: str
+    FIELD_PREFIX: str
 
     @abc.abstractmethod
     def validate(self) -> List[str]:

@@ -8,3 +8,4 @@ class Filter(V2Mixin, NamespacedResource):
     PATH_TEMPLATE = "/api/core/v2/namespaces/{namespace}/filters"
     TYPE = "EventFilter"
     API_VERSION = "core/v2"
+    FIELD_PREFIX = "filter"

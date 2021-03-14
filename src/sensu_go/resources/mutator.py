@@ -8,3 +8,4 @@ class Mutator(V2Mixin, NamespacedResource):
     PATH_TEMPLATE = "/api/core/v2/namespaces/{namespace}/mutators"
     TYPE = "Mutator"
     API_VERSION = "core/v2"
+    FIELD_PREFIX = "mutator"

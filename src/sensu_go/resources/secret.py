@@ -8,3 +8,4 @@ class Secret(V1Mixin, NamespacedResource):
     PATH_TEMPLATE = "/api/enterprise/secrets/v1/namespaces/{namespace}/secrets"
     TYPE = "Secret"
     API_VERSION = "secrets/v1"
+    FIELD_PREFIX = "secret"

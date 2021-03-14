@@ -8,3 +8,4 @@ class Silence(V2Mixin, NamespacedResource):
     PATH_TEMPLATE = "/api/core/v2/namespaces/{namespace}/silenced"
     TYPE = "Silenced"
     API_VERSION = "core/v2"
+    FIELD_PREFIX = "silenced"

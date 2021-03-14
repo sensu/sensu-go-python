@@ -5,6 +5,7 @@ from typing import List, Optional, Type, TypeVar
 from sensu_go.clients.http.base import HTTPClient
 from sensu_go.clients.resource.base import ResourceClient
 from sensu_go.resources.base import Resource
+from sensu_go.clients.resource.operator import Operator
 from sensu_go.resources.namespaced import NamespacedResource as NsResource
 from sensu_go.typing import JSONItem
 
@@ -34,8 +35,17 @@ class NamespacedClient(ResourceClient):
     def _get_path(self, ns: Optional[str], name: Optional[str] = None) -> str:
         return self.resource_class.get_path(namespace=ns or self._default_ns, name=name)
 
-    def list(self, namespace: Optional[str] = None) -> List[NsResource]:
-        return self.do_list(self._get_path(namespace))
+    def list(
+        self,
+        namespace: Optional[str] = None,
+        label_selector: Optional[Operator] = None,
+        field_selector: Optional[Operator] = None,
+    ) -> List[NsResource]:
+        return self.do_list(
+            self._get_path(namespace),
+            label_selector=label_selector,
+            field_selector=field_selector,
+        )
 
     def find(self, name: str, namespace: Optional[str] = None) -> Optional[NsResource]:
         return self.do_find(self._get_path(namespace, name))
