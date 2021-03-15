@@ -380,6 +380,19 @@ def demo_events(client):
     printiter(client.events.list())
     printiter(client.events.list("demo"))
 
+    c = client.checks.create(
+        metadata={
+            "name": "server-health",
+            "namespace": "demo",
+        },
+        spec={
+            "command": "collect.sh",
+            "subscriptions": ["system"],
+            "handlers": ["slack"],
+            "interval": 10,
+            "publish": True,
+        },
+    )
     event = client.events.create(
         metadata={"namespace": "demo"},
         spec={
@@ -400,7 +413,10 @@ def demo_events(client):
     printiter(client.events.list())
     printiter(client.events.list("demo"))
 
-    event.delete()
+    printiter(client.checks.list("demo"))
+    printiter(c.events)
+
+    c.events.delete()
 
     printiter(client.events.list())
     printiter(client.events.list("demo"))
