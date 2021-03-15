@@ -1,18 +1,11 @@
 # Copyright (c) 2020 XLAB Steampunk
 
 import abc
-from typing import cast, List, Optional, Type, TypeVar, TYPE_CHECKING
+from typing import cast, List, Optional, Type, TypeVar
 
+from sensu_go.clients.http.base import HTTPClient
+from sensu_go.errors import ResponseError
 from sensu_go.typing import JSONItem
-
-# If we want to typecheck our code, we need to introduce a cyclic import
-# ResourceClient <-> Resource. Mypy can handle such imports just fine (it does
-# not run the code), but they would cause trouble during the normal operation
-# of library. Do note that we also "stringified" the client type in the
-# declarations below in order to avoid missing definitions during normal
-# operation.
-if TYPE_CHECKING:
-    from sensu_go.clients.resource.base import ResourceClient
 
 T = TypeVar("T", bound="Resource")
 
@@ -40,7 +33,7 @@ class Resource(metaclass=abc.ABCMeta):
         pass
 
     @classmethod
-    def from_api(cls: Type[T], client: "ResourceClient", data: JSONItem) -> T:
+    def from_api(cls: Type[T], client: HTTPClient, data: JSONItem) -> T:
         return cls(client, **cls.api_to_native(data, cls.TYPE))
 
     @classmethod
@@ -54,15 +47,17 @@ class Resource(metaclass=abc.ABCMeta):
 
     def __init__(
         self,
-        client: "ResourceClient",
+        client: HTTPClient,
         spec: JSONItem,
-        metadata: Optional[JSONItem] = None,
+        metadata: JSONItem,
         type: Optional[str] = None,
     ) -> None:
-        self.client = client
+        self._client = client
 
         self._spec = spec
-        self._metadata = metadata or {}
+        self._metadata = metadata
+
+        # Type is optional if the derived class provides it.
         self._type = type or self.TYPE
 
         errors = self.validate()
@@ -103,21 +98,45 @@ class Resource(metaclass=abc.ABCMeta):
     def class_path(self) -> str:
         return self.get_path(namespace=self.namespace)
 
-    def update(self, other: "Resource") -> None:
-        self._spec = other._spec
-        self._metadata = other._metadata
-
-    def to_api(self) -> JSONItem:
-        return self.native_to_api(self.spec, self.metadata, self.type, self.api_version)
-
     def save(self) -> None:
-        self.client.save(self)
+        resp = self._client.put(
+            self.path,
+            self.native_to_api(self.spec, self.metadata, self.type, self.api_version),
+        )
+        if resp.status not in (200, 201):
+            raise ResponseError(
+                "Expected 200 or 201 when updating resource",
+                resp.url,
+                resp.status,
+                resp.text,
+            )
+
+        # We need to reload the resource because the backend can add some
+        # default values on top of what we sent.
+        self.reload()
 
     def reload(self) -> None:
-        self.client.reload(self)
+        resp = self._client.get(self.path)
+        if resp.status != 200:
+            raise ResponseError(
+                "Expected 200 when fetching resource",
+                resp.url,
+                resp.status,
+                resp.text,
+            )
+        native = self.api_to_native(cast(JSONItem, resp.json), self.type)
+        self._spec = native["spec"]
+        self._metadata = native["metadata"]
 
     def delete(self) -> None:
-        self.client.do_delete(self.path)
+        resp = self._client.delete(self.path)
+        if resp.status != 204:
+            raise ResponseError(
+                "Expected 204 when deleting resource",
+                resp.url,
+                resp.status,
+                resp.text,
+            )
 
     def __repr__(self) -> str:
         return "{}({})".format(self.type, self.path)

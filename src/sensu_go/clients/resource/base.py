@@ -13,8 +13,8 @@ T = TypeVar("T", bound=Resource)
 
 class ResourceClient:
     def __init__(self, client: HTTPClient, resource_class: Type[T]) -> None:
-        self.client = client
-        self.resource_class = resource_class
+        self._client = client
+        self._resource_class = resource_class
 
     def do_list(
         self,
@@ -57,8 +57,8 @@ class ResourceClient:
         # TODO: Add check for invalid JSON
         return self.resource_class.from_api(self, cast(JSONItem, resp.json))
 
-    def do_get(self, path: str) -> T:
-        resp = self.client.get(path)
+    def _get(self, path: str) -> T:
+        resp = self._client.get(path)
         if resp.status != 200:
             raise ResponseError(
                 "Expected 200 when fetching resource",
@@ -67,10 +67,18 @@ class ResourceClient:
                 resp.text,
             )
         # TODO: Add check for invalid JSON
-        return self.resource_class.from_api(self, cast(JSONItem, resp.json))
+        return self._resource_class.from_api(self._client, cast(JSONItem, resp.json))
 
-    def do_delete(self, path: str) -> None:
-        resp = self.client.delete(path)
+    def _find(self, path: str) -> Optional[T]:
+        try:
+            return self._get(path)
+        except ResponseError as e:
+            if e.status != 404:
+                raise e
+        return None
+
+    def _delete(self, path: str) -> None:
+        resp = self._client.delete(path)
         if resp.status != 204:
             raise ResponseError(
                 "Expected 204 when deleting resource",
@@ -88,26 +96,9 @@ class ResourceClient:
         # We do not use POST for creating resources because not all resources support
         # this method of creation (for example, secrets and secrets providers).
 
-        resource = self.resource_class(self, spec, metadata, type)
-        if self.do_find(resource.path):
+        resource = self._resource_class(self._client, spec, metadata, type)
+        if self._find(resource.path):
             raise ValueError("Resource at {} already exists.".format(resource.path))
 
-        self.save(resource)
+        resource.save()
         return resource
-
-    def save(self, resource: T) -> None:
-        resp = self.client.put(resource.path, resource.to_api())
-        if resp.status not in (200, 201):
-            raise ResponseError(
-                "Expected 200 or 201 when updating resource",
-                resp.url,
-                resp.status,
-                resp.text,
-            )
-
-        # We need to reload the resource because the backend can add some
-        # default values on top of what we sent.
-        self.reload(resource)
-
-    def reload(self, resource: T) -> None:
-        resource.update(cast(T, self.do_get(resource.path)))
