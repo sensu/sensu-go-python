@@ -64,6 +64,10 @@ def print_cluster_resource(resource):
     print("  Type: " + resource.type)
 
 
+def printiter(iter):
+    print("[{}]".format(", ".join(str(i) for i in iter)))
+
+
 @delimit
 def demo_namespaces(client):
     # Find does not fail if resource does not exist, it returns None
@@ -81,12 +85,12 @@ def demo_namespaces(client):
     client.namespaces.create(metadata={}, spec={"name": "dummy"})
 
     # List
-    print(client.namespaces.list())
+    printiter(client.namespaces.list())
 
     # Delete
     namespace.delete()
     client.namespaces.delete("dummy")
-    print(client.namespaces.list())
+    printiter(client.namespaces.list())
 
 
 @delimit
@@ -118,7 +122,7 @@ def demo_secrets_providers(client):
     print_cluster_resource(provider)
 
     # List
-    print(client.secrets_providers.list())
+    printiter(client.secrets_providers.list())
 
     # Update
     provider.spec["max_retries"] = 3
@@ -195,8 +199,8 @@ def demo_assets(client):
     )
 
     # List
-    print(client.assets.list())
-    print(client.assets.list("demo"))
+    printiter(client.assets.list())
+    printiter(client.assets.list("demo"))
 
     # Update
     asset.spec["builds"][0]["url"] = "https://my.new.url/asset.tar.gz"
@@ -208,11 +212,11 @@ def demo_assets(client):
 
     # Delete
     asset.delete()
-    print(client.assets.list())
-    print(client.assets.list("demo"))
+    printiter(client.assets.list())
+    printiter(client.assets.list("demo"))
     client.assets.delete("sensu-slack-handler", "demo")
-    print(client.assets.list())
-    print(client.assets.list("demo"))
+    printiter(client.assets.list())
+    printiter(client.assets.list("demo"))
 
 
 @delimit
@@ -263,8 +267,8 @@ def demo_checks(client):
     )
 
     # List
-    print(client.checks.list())
-    print(client.checks.list("demo"))
+    printiter(client.checks.list())
+    printiter(client.checks.list("demo"))
 
     # Update
     check.spec["command"] = "fancy_collect.sh"
@@ -276,11 +280,11 @@ def demo_checks(client):
 
     # Delete
     check.delete()
-    print(client.checks.list())
-    print(client.checks.list("demo"))
+    printiter(client.checks.list())
+    printiter(client.checks.list("demo"))
     client.checks.delete("check_minimum", "demo")
-    print(client.checks.list())
-    print(client.checks.list("demo"))
+    printiter(client.checks.list())
+    printiter(client.checks.list("demo"))
 
 
 @delimit
@@ -335,7 +339,7 @@ def demo_entities(client):
     )
 
     # List
-    print(client.entities.list())
+    printiter(client.entities.list())
 
     # Update
     entity.spec["deregister"] = True
@@ -348,13 +352,13 @@ def demo_entities(client):
     # Delete
     entity.delete()
     client.entities.delete("sensu-docs", "demo")
-    print(client.entities.list())
+    printiter(client.entities.list())
 
 
 @delimit
 def demo_events(client):
-    print(client.events.list())
-    print(client.events.list("demo"))
+    printiter(client.events.list())
+    printiter(client.events.list("demo"))
 
     client.events.create(
         metadata={},
@@ -373,8 +377,8 @@ def demo_events(client):
         },
     )
 
-    print(client.events.list())
-    print(client.events.list("demo"))
+    printiter(client.events.list())
+    printiter(client.events.list("demo"))
 
     event = client.events.create(
         metadata={"namespace": "demo"},
@@ -393,18 +397,18 @@ def demo_events(client):
         },
     )
 
-    print(client.events.list())
-    print(client.events.list("demo"))
+    printiter(client.events.list())
+    printiter(client.events.list("demo"))
 
     event.delete()
 
-    print(client.events.list())
-    print(client.events.list("demo"))
+    printiter(client.events.list())
+    printiter(client.events.list("demo"))
 
     client.events.delete("server1/server-health")
 
-    print(client.events.list())
-    print(client.events.list("demo"))
+    printiter(client.events.list())
+    printiter(client.events.list("demo"))
 
 
 @delimit
@@ -445,7 +449,7 @@ def demo_filters(client):
     )
 
     # List
-    print(client.filters.list())
+    printiter(client.filters.list())
 
     # Update
     filter.spec["action"] = "deny"
@@ -458,7 +462,7 @@ def demo_filters(client):
     # Delete
     filter.delete()
     client.filters.delete("filter_minimum", "demo")
-    print(client.filters.list())
+    printiter(client.filters.list())
 
 
 @delimit
@@ -499,7 +503,7 @@ def demo_handlers(client):
     )
 
     # List
-    print(client.handlers.list())
+    printiter(client.handlers.list())
 
     # Update
     handler.spec["command"] = "other-command"
@@ -512,7 +516,7 @@ def demo_handlers(client):
     # Delete
     handler.delete()
     client.handlers.delete("pipe_handler_minimum", "demo")
-    print(client.handlers.list())
+    printiter(client.handlers.list())
 
 
 @delimit
@@ -561,7 +565,7 @@ def demo_hooks(client):
     )
 
     # List
-    print(client.hooks.list())
+    printiter(client.hooks.list())
 
     # Update
     hook.spec["timeout"] = 30
@@ -574,7 +578,7 @@ def demo_hooks(client):
     # Delete
     hook.delete()
     client.hooks.delete("process_tree", "demo")
-    print(client.hooks.list())
+    printiter(client.hooks.list())
 
 
 @delimit
@@ -623,7 +627,7 @@ def demo_mutators(client):
     )
 
     # List
-    print(client.mutators.list())
+    printiter(client.mutators.list())
 
     # Update
     mutator.spec["env_vars"].extend("ANOTHER_VAR=second_value")
@@ -636,7 +640,7 @@ def demo_mutators(client):
     # Delete
     mutator.delete()
     client.mutators.delete("example-mutator", "demo")
-    print(client.mutators.list())
+    printiter(client.mutators.list())
 
 
 @delimit
@@ -674,7 +678,7 @@ def demo_secrets(client):
     )
 
     # List
-    print(client.secrets.list())
+    printiter(client.secrets.list())
 
     # Update
     secret.spec["id"] = "OTHER_TOKEN"
@@ -687,7 +691,7 @@ def demo_secrets(client):
     # Delete
     secret.delete()
     client.secrets.delete("sensu-ansible-token", "demo")
-    print(client.secrets.list())
+    printiter(client.secrets.list())
 
 
 @delimit
@@ -736,7 +740,7 @@ def demo_silences(client):
     )
 
     # List
-    print(client.silences.list())
+    printiter(client.silences.list())
 
     # Update
     silence.spec["expire_on_resolve"] = False
@@ -749,7 +753,7 @@ def demo_silences(client):
     # Delete
     silence.delete()
     client.silences.delete("entity:i-424242:check_ntp", "demo")
-    print(client.silences.list())
+    printiter(client.silences.list())
 
 
 if __name__ == "__main__":

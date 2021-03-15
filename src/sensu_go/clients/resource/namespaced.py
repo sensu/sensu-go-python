@@ -1,22 +1,21 @@
 # Copyright (c) 2020 XLAB Steampunk
 
-from typing import List, Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar
 
 from sensu_go.clients.http.base import HTTPClient
-from sensu_go.clients.resource.base import ResourceClient
-from sensu_go.resources.base import Resource
+from sensu_go.clients.resource.base import ResourceClient, ResourceIter
 from sensu_go.clients.resource.operator import Operator
 from sensu_go.resources.namespaced import NamespacedResource
 from sensu_go.typing import JSONItem
 
-T = TypeVar("T", bound=Resource)
+T = TypeVar("T", bound=NamespacedResource)
 
 
-class NamespacedClient(ResourceClient):
+class NamespacedClient(ResourceClient[T]):
     def __init__(
         self,
         client: HTTPClient,
-        resource_class: Type[NsResource],
+        resource_class: Type[T],
         default_namespace: str,
     ) -> None:
         super().__init__(client, resource_class)
@@ -32,11 +31,13 @@ class NamespacedClient(ResourceClient):
         namespace: Optional[str] = None,
         label_selector: Optional[Operator] = None,
         field_selector: Optional[Operator] = None,
-    ) -> List[NsResource]:
-        return self.do_list(
+    ) -> ResourceIter[T]:
+        return ResourceIter[T](
+            self._resource_class,
+            self._client,
             self._get_path(namespace),
-            label_selector=label_selector,
-            field_selector=field_selector,
+            label_selector,
+            field_selector,
         )
 
     def create(

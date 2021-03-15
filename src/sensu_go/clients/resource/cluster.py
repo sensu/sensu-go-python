@@ -1,22 +1,26 @@
 # Copyright (c) 2020 XLAB Steampunk
 
-from typing import List, Optional
+from typing import Optional, TypeVar
 
 from sensu_go.clients.resource.operator import Operator
-from sensu_go.clients.resource.base import ResourceClient
+from sensu_go.clients.resource.base import ResourceClient, ResourceIter
 from sensu_go.resources.cluster import ClusterResource
 
+T = TypeVar("T", bound=ClusterResource)
 
-class ClusterClient(ResourceClient):
+
+class ClusterClient(ResourceClient[T]):
     def list(
         self,
         label_selector: Optional[Operator] = None,
         field_selector: Optional[Operator] = None,
-    ) -> List[ClusterResource]:
-        return self.do_list(
-            self.resource_class.get_path(),
-            label_selector=label_selector,
-            field_selector=field_selector,
+    ) -> ResourceIter[T]:
+        return ResourceIter[T](
+            self._resource_class,
+            self._client,
+            self._resource_class.get_path(),
+            label_selector,
+            field_selector,
         )
 
     def get(self, name: str) -> T:
