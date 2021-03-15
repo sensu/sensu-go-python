@@ -1,6 +1,6 @@
 # Copyright (c) 2020 XLAB Steampunk
 
-from typing import cast, List, Optional, Type, TypeVar
+from typing import cast, Generator, Generic, Iterable, List, Optional, Type, TypeVar
 
 from sensu_go.clients.http.base import HTTPClient
 from sensu_go.errors import ResponseError
@@ -11,51 +11,60 @@ from sensu_go.typing import JSONItem
 T = TypeVar("T", bound=Resource)
 
 
-class ResourceClient:
-    def __init__(self, client: HTTPClient, resource_class: Type[T]) -> None:
-        self._client = client
-        self._resource_class = resource_class
-
-    def do_list(
+class ResourceIter(Iterable[T]):
+    def __init__(
         self,
+        resource_class: Type[T],
+        client: HTTPClient,
         path: str,
         label_selector: Optional[Operator] = None,
         field_selector: Optional[Operator] = None,
-    ) -> List[T]:
-        query = {}
+    ) -> None:
+        self._resource_class = resource_class
+        self._client = client
+        self._path = path
+
+        self._limit = 100
+
+        self._query = {}
         if label_selector:
-            query["labelSelector"] = label_selector.serialize()
+            self._query["labelSelector"] = label_selector.serialize()
         if field_selector:
-            query["fieldSelector"] = field_selector.serialize(
-                self.resource_class.FIELD_PREFIX
+            self._query["fieldSelector"] = field_selector.serialize(
+                self._resource_class.FIELD_PREFIX
             )
 
-        resp = self.client.get(path, query=query)
-        if resp.status != 200:
-            raise ResponseError(
-                "Expected 200 when listing resources",
-                resp.url,
-                resp.status,
-                resp.text,
-            )
-        # TODO: Add check for invalid JSON
-        data = cast(List[JSONItem], resp.json)
-        return [self.resource_class.from_api(self, d) for d in data]
+    def __iter__(self) -> Generator[T, None, None]:
+        query = dict(self._query, limit=str(self._limit))
 
-    def do_find(self, path: str) -> Optional[T]:
-        resp = self.client.get(path)
-        if resp.status == 404:
-            return None
+        while True:
+            resp = self._client.get(self._path, query=query)
+            if resp.status != 200:
+                raise ResponseError(
+                    "Expected 200 when listing resources",
+                    resp.url,
+                    resp.status,
+                    resp.text,
+                )
 
-        if resp.status != 200:
-            raise ResponseError(
-                "Expected 200 when fetching resource",
-                resp.url,
-                resp.status,
-                resp.text,
-            )
-        # TODO: Add check for invalid JSON
-        return self.resource_class.from_api(self, cast(JSONItem, resp.json))
+            # TODO: Add check for invalid JSON
+            data = cast(List[JSONItem], resp.json)
+            for d in data:
+                yield self._resource_class.from_api(self._client, d)
+
+            query["continue"] = resp.headers.get("sensu-continue", "")
+            if not query["continue"]:
+                break
+
+    def delete(self) -> None:
+        for i in self:
+            i.delete()
+
+
+class ResourceClient(Generic[T]):
+    def __init__(self, client: HTTPClient, resource_class: Type[T]) -> None:
+        self._client = client
+        self._resource_class = resource_class
 
     def _get(self, path: str) -> T:
         resp = self._client.get(path)
