@@ -60,11 +60,8 @@ class Resource(metaclass=abc.ABCMeta):
         # Type is optional if the derived class provides it.
         self._type = type or self.TYPE
 
-        errors = self.validate()
         if not self._type:
-            errors.append("Type not set. Please specify a resource type.")
-        if errors:
-            raise ValueError("\n".join(errors))
+            raise ValueError("Type not set. Please specify a resource type.")
 
     @property
     def spec(self) -> JSONItem:
@@ -99,6 +96,10 @@ class Resource(metaclass=abc.ABCMeta):
         return self.get_path(namespace=self.namespace)
 
     def save(self) -> None:
+        errors = self.validate()
+        if errors:
+            raise ValueError("\n".join(errors))
+
         resp = self._client.put(
             self.path,
             self.native_to_api(self.spec, self.metadata, self.type, self.api_version),
