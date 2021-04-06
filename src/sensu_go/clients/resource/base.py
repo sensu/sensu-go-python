@@ -106,6 +106,10 @@ class ResourceClient(Generic[T]):
         # this method of creation (for example, secrets and secrets providers).
 
         resource = self._resource_class(self._client, spec, metadata, type)
+        errors = resource.validate()
+        if errors:
+            raise ValueError("\n".join(errors))
+
         if self._find(resource.path):
             raise ValueError("Resource at {} already exists.".format(resource.path))
 
