@@ -28,6 +28,7 @@ def main():
     demo_mutators(client)
     demo_secrets(client)
     demo_silences(client)
+    demo_users(client)
 
     # Events are a bit special
     demo_events(client)
@@ -770,6 +771,50 @@ def demo_silences(client):
     silence.delete()
     client.silences.delete("entity:i-424242:check_ntp", "demo")
     printiter(client.silences.list())
+
+
+@delimit
+def demo_users(client):
+    # Find does not fail if resource does not exist, it returns None
+    print(client.users.find("nonexistent"))
+
+    # Get fails if it canot retrieve a resource
+    try:
+        client.users.get("nonexistent")
+    except errors.SensuError as e:
+        print(e)
+
+    # Create a user without a password should throw an error
+    try:
+        client.users.create(metadata={}, spec={"username": "demo_user"})
+    except ValueError as e:
+        print(e)
+
+    user = client.users.create(
+        metadata={},
+        spec={"username": "demo_user", "password":"demouserpassword"},
+    )
+    print_cluster_resource(user)
+
+    # List
+    print(client.users.find("demo_user"))
+    printiter(client.users.list())
+
+    # Update
+    user.spec["password"] = "newpassword"
+    print(user.spec)
+    user.save()
+
+    # If we are expecting the resource on the backend to change, we can reload the data
+    user.reload()
+
+    # Try to delete a user, as users cannot be deleted.
+    try:
+        user.delete()
+    except Exception as e:
+        print(e)
+
+    printiter(client.users.list())
 
 
 if __name__ == "__main__":
