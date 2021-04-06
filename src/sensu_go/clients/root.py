@@ -19,6 +19,7 @@ from sensu_go.resources.mutator import Mutator
 from sensu_go.resources.secret import Secret
 from sensu_go.resources.secrets_provider import SecretsProvider
 from sensu_go.resources.silence import Silence
+from sensu_go.resources.user import User
 
 from sensu_go.resources.namespace import Namespace
 
@@ -66,6 +67,7 @@ class Client:
         # Cluster-wide API
         self.namespaces = ClusterClient(self._client, Namespace)
         self.secrets_providers = ClusterClient(self._client, SecretsProvider)
+        self.users = ClusterClient(self._client, User)
 
     def get(self, path: str) -> Response:
         return self._client.get(path)
