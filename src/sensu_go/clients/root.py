@@ -2,6 +2,7 @@
 
 from typing import Optional
 
+from sensu_go.clients.http.api_key import ApiKeyClient
 from sensu_go.clients.http.base import HTTPClient, Response
 from sensu_go.clients.http.user_pass import UserPassClient
 
@@ -28,13 +29,16 @@ from sensu_go.typing import JSON
 
 def _get_http_client(
     address: str,
+    api_key: Optional[str] = None,
     username: Optional[str] = None,
     password: Optional[str] = None,
     verify: bool = True,
     ca_path: Optional[str] = None,
 ) -> HTTPClient:
     # TODO(@tadeboro): Add parameter validation
-    if username and password:
+    if api_key:
+        return ApiKeyClient(address, api_key, verify, ca_path)
+    elif username and password:
         return UserPassClient(address, username, password, verify, ca_path)
     raise ValueError("Invalid set of client arguments.")
 
@@ -43,13 +47,16 @@ class Client:
     def __init__(
         self,
         address: str,
+        api_key: Optional[str] = None,
         username: Optional[str] = None,
         password: Optional[str] = None,
         default_namespace: str = "default",
         verify: bool = True,
         ca_path: Optional[str] = None,
     ) -> None:
-        self._client = _get_http_client(address, username, password, verify, ca_path)
+        self._client = _get_http_client(
+            address, api_key, username, password, verify, ca_path
+        )
 
         # Namespaced API
         ns = default_namespace

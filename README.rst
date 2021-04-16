@@ -42,6 +42,14 @@ Before we can start using the client, we need to create one:
        "http://localhost:8080", username="admin", password="P@ssw0rd!"
    )
 
+If we have API key, we can also use that to create a client instance:
+
+.. code-block:: python
+
+   client = sensu_go.Client(
+       "http://localhost:8080", api_key="471152a6-b4b1-4b51-84dd-334a9c230b93"
+   )
+
 Now we can list available resources in the `default` namespace:
 
 .. code-block:: python
