@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches: [ main ]
-  pull_requests:
+  pull_request:
   schedule:
     # Run test on Monday and Thursday at 4:23 UTC
     - cron: "23 4 * * 1,4"
@@ -15,8 +15,22 @@ jobs:
 
     strategy:
       matrix:
-        python: [ "3.6" ]
+        python: [ "3.6", "3.7", "3.8", "3.9" ]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install package
+        run: pip install .[dev]
+
+      - name: Run linters
+        run: make lint
+
+      - name: Run unit tests
+        run: make unit
