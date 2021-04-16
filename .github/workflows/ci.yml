@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_requests:
+  schedule:
+    # Run test on Monday and Thursday at 4:23 UTC
+    - cron: "23 4 * * 1,4"
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: [ "3.6" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
