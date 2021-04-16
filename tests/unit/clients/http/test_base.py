@@ -57,8 +57,6 @@ class TestHTTPClientConstructor:
         session_mock.return_value.verify is True
 
     def test_trailing_slash_removal(self, mocker):
-        session_mock = mocker.patch("requests.Session")
-
         client = DummyClient("https://my.url/")
 
         assert client.address == "https://my.url"
@@ -66,14 +64,14 @@ class TestHTTPClientConstructor:
     def test_kill_verification(self, mocker):
         session_mock = mocker.patch("requests.Session")
 
-        client = DummyClient("https://my.url", verify=False)
+        DummyClient("https://my.url", verify=False)
 
         session_mock.return_value.verify is False
 
     def test_use_custom_ca_bundle_for_verification(self, mocker):
         session_mock = mocker.patch("requests.Session")
 
-        client = DummyClient("https://my.url", ca_path="some_path")
+        DummyClient("https://my.url", ca_path="some_path")
 
         session_mock.return_value.verify == "some_path"
 
@@ -91,7 +89,7 @@ class TestHTTPClientConstructor:
     ):
         session_mock = mocker.patch("requests.Session")
 
-        client = DummyClient("https://my.url", verify=verify, ca_path=ca_path)
+        DummyClient("https://my.url", verify=verify, ca_path=ca_path)
 
         session_mock.return_value.verify == verify_result
 
@@ -122,7 +120,7 @@ class TestHTTPClientGet:
         client.get("/get/path")
 
 
-class TestHTTPClientGet:
+class TestHTTPClientPost:
     def test_right_method(self, requests_mock):
         requests_mock.post("https://my.url/post/path")
         client = DummyClient("https://my.url")
@@ -130,7 +128,7 @@ class TestHTTPClientGet:
         client.post("/post/path", dict(post="data"))
 
 
-class TestHTTPClientGet:
+class TestHTTPClientPut:
     def test_right_method(self, requests_mock):
         requests_mock.put("https://my.url/put/path")
         client = DummyClient("https://my.url")
@@ -138,7 +136,7 @@ class TestHTTPClientGet:
         client.put("/put/path", dict(put="data"))
 
 
-class TestHTTPClientGet:
+class TestHTTPClientDelete:
     def test_right_method(self, requests_mock):
         requests_mock.delete("https://my.url/delete/path")
         client = DummyClient("https://my.url")

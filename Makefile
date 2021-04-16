@@ -11,7 +11,7 @@ format:
 .PHONY: lint
 lint:
 	venv/bin/black --check --diff src/sensu_go tests
-	venv/bin/flake8 src/sensu_go
+	venv/bin/flake8 src/sensu_go tests
 	venv/bin/mypy --strict src/sensu_go
 
 .PHONY: unit
