@@ -792,7 +792,7 @@ def demo_users(client):
 
     user = client.users.create(
         metadata={},
-        spec={"username": "demo_user", "password":"demouserpassword"},
+        spec={"username": "demo_user", "password": "demouserpassword"},
     )
     print_cluster_resource(user)
 
