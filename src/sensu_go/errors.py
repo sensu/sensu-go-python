@@ -2,15 +2,15 @@
 
 
 class SensuError(Exception):
-    """ Base exception for the sensu-go package. """
+    """Base exception for the sensu-go package."""
 
 
 class HTTPError(SensuError):
-    """ Error that indicates a problem with backend connection. """
+    """Error that indicates a problem with backend connection."""
 
 
 class ResponseError(SensuError):
-    """ Error that indicates a problem with backend's response. """
+    """Error that indicates a problem with backend's response."""
 
     def __init__(self, msg: str, url: str, status: int, text: str) -> None:
         self.url = url
@@ -23,4 +23,4 @@ class ResponseError(SensuError):
 
 
 class AuthError(ResponseError):
-    """ Error that indicates a problem with credentials. """
+    """Error that indicates a problem with credentials."""
