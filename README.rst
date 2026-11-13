@@ -1,6 +1,6 @@
 .. warning::
 
-   **This repository is scheduled to be archived on 13th November 2026.**
+   **This repository is scheduled to be archived on 10th December 2026.**
 
    After that date it will be read-only: no new commits, issues, or pull requests, and no further maintenance or security updates will be issued.
 
